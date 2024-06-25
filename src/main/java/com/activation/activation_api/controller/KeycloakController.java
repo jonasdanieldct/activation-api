@@ -1,6 +1,8 @@
 package com.activation.activation_api.controller;
 
+import com.activation.activation_api.model.AccessToken;
 import com.activation.activation_api.model.Keycloak;
+import com.activation.activation_api.model.request.CreateKeycloakUserRequest;
 import com.activation.activation_api.service.KeycloakService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,8 +26,13 @@ public class KeycloakController {
     KeycloakService keycloakService;
 
     @GetMapping("/accessToken")
-    public String getAccessToken(@RequestBody Keycloak keycloak){
-        return keycloakService.getAccessToken(keycloak);
+    public AccessToken getAccessToken(){
+        return keycloakService.generateAccessToken();
+    }
+
+    @GetMapping("/create")
+    public void createUser(@RequestBody CreateKeycloakUserRequest createKeycloakUserRequest){
+        keycloakService.createKeycloakUser(createKeycloakUserRequest);
     }
 
 }

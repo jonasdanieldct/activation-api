@@ -3,14 +3,19 @@ package com.activation.activation_api.service.impl;
 import com.activation.activation_api.config.KeycloakEndpointProperties;
 import com.activation.activation_api.model.AccessToken;
 import com.activation.activation_api.config.KeycloakProperties;
+import com.activation.activation_api.model.KeycloakUserDetails;
 import com.activation.activation_api.model.request.CreateKeycloakUserRequest;
 import com.activation.activation_api.service.KeycloakService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service public class KeycloakServiceImpl implements KeycloakService {
 
@@ -46,5 +51,16 @@ import org.springframework.web.client.RestTemplate;
 
         HttpEntity<CreateKeycloakUserRequest> requestEntity = new HttpEntity<>(createKeycloakUserRequest, headers);
         return restTemplate.exchange(keycloakEndpointProperties.getCreateUser(),HttpMethod.POST,requestEntity,String.class).toString();
+    }
+
+    public List<KeycloakUserDetails> getUserDetails(String username){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(generateAccessToken().getAccessToken());
+
+        HttpEntity requestEntity = new  HttpEntity(headers);
+        String endpoint = keycloakEndpointProperties.getGetUserDetails()+ "?username="+username;
+        return restTemplate.exchange(endpoint, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<KeycloakUserDetails>>() {}).getBody();
+
     }
 }

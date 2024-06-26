@@ -10,4 +10,5 @@ import org.springframework.stereotype.Component;
     private String baseUrl;
     private String token;
     private String createUser;
+    private String getUserDetails;
 }

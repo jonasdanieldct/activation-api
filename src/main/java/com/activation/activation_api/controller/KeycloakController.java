@@ -3,7 +3,6 @@ package com.activation.activation_api.controller;
 import com.activation.activation_api.model.AccessToken;
 import com.activation.activation_api.model.KeycloakUserDetails;
 import com.activation.activation_api.model.request.CreateKeycloakUserRequest;
-import com.activation.activation_api.model.response.KeycloakUserDetailsResponse;
 import com.activation.activation_api.service.KeycloakService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

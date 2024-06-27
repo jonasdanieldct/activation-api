@@ -15,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig {
 
     public static final String ADMIN = "Admin";
-    public static final String USER = "user";
+    public static final String USER = "User";
 
     private final JwtAuthConverter jwtAuthConverter;
 
@@ -25,10 +25,8 @@ public class WebSecurityConfig {
         http.
                 authorizeHttpRequests(auth ->
                 {
-                    auth.requestMatchers(HttpMethod.GET).hasRole(ADMIN);
-//                    auth.requestMatchers(HttpMethod.GET, "/test/hello-2").hasRole(ADMIN);
-//                    auth.requestMatchers(HttpMethod.GET, "/test/hello-3").hasRole(USER);
-//                    auth.requestMatchers(HttpMethod.GET, "/test/hello-4").hasAnyRole(ADMIN, USER);
+                    auth.requestMatchers(HttpMethod.GET).permitAll();
+                    auth.requestMatchers(HttpMethod.POST,"/keycloak/").hasRole(ADMIN);
                     auth.anyRequest().authenticated();
                 });
 

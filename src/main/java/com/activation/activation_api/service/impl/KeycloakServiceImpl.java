@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service public class KeycloakServiceImpl implements KeycloakService {
 
@@ -59,8 +60,8 @@ import java.util.List;
         headers.setBearerAuth(generateAccessToken().getAccessToken());
 
         HttpEntity requestEntity = new  HttpEntity(headers);
-        String endpoint = keycloakEndpointProperties.getGetUserDetails()+ "?username="+username;
-        return restTemplate.exchange(endpoint, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<KeycloakUserDetails>>() {}).getBody();
-
+        String endpoint = keycloakEndpointProperties.getGetUserDetails()+ "?username="+username+"&max=1";
+        List<KeycloakUserDetails> keycloakUsers = restTemplate.exchange(endpoint, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<KeycloakUserDetails>>() {}).getBody();
+        return keycloakUsers.stream().filter(user -> user.getUsername().equals(username)).collect(Collectors.toList());
     }
 }

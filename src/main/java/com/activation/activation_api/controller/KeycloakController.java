@@ -25,7 +25,7 @@ public class KeycloakController {
         return keycloakService.generateAccessToken();
     }
 
-    @GetMapping("/create")
+    @PostMapping("/create")
     public void createUser(@RequestBody CreateKeycloakUserRequest createKeycloakUserRequest){
         keycloakService.createKeycloakUser(createKeycloakUserRequest);
     }

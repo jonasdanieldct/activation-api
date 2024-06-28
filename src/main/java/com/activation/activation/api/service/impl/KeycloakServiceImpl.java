@@ -13,12 +13,10 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +32,7 @@ import java.util.stream.Collectors;
     @Autowired
     KeycloakProperties keycloakProperties;
 
-    private static final Logger logger = LoggerFactory.getLogger(KeycloakServiceImpl.class);
+    public static final Logger logger = LoggerFactory.getLogger(KeycloakServiceImpl.class);
 
     public AccessToken generateAccessToken() {
         logger.info("KeycloakServiceImpl.generateAccessToken");
@@ -63,7 +61,7 @@ import java.util.stream.Collectors;
         return restTemplate.exchange(keycloakEndpointProperties.getCreateUser(), HttpMethod.POST, requestEntity, String.class).toString();
     }
 
-    public List<KeycloakUserDetails> getUserDetails(String username){
+    public KeycloakUserDetails getUserDetails(String username){
         logger.info("KeycloakServiceImpl.getuserDetails (username :{})", username);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -72,13 +70,13 @@ import java.util.stream.Collectors;
 
         HttpEntity requestEntity = new HttpEntity(headers);
         String endpoint = keycloakEndpointProperties.getGetUserDetails() + "?username=" + username + "&max=1";
-            keycloakUsers = restTemplate.exchange(endpoint, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<KeycloakUserDetails>>() {
-            }).getBody().stream().filter(user -> user.getUsername().equals(username)).collect(Collectors.toList());
+        KeycloakUserDetails keycloakUser = restTemplate.exchange(endpoint, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<KeycloakUserDetails>>() {
+            }).getBody().stream().filter(user -> user.getUsername().equals(username)).findFirst().orElse(null);
 
-            if (keycloakUsers.isEmpty()) {
+            if (keycloakUser == null) {
                 throw new NoUserFoundException("No user found with username: " + username);
             }
 
-        return keycloakUsers;
+        return keycloakUser;
     }
 }

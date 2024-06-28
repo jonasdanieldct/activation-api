@@ -11,5 +11,5 @@ import java.util.List;
 public interface KeycloakService {
     public AccessToken generateAccessToken();
     public String createKeycloakUser(CreateKeycloakUserRequest createKeycloakUserRequest);
-    public List<KeycloakUserDetails> getUserDetails(String username);
+    public KeycloakUserDetails getUserDetails(String username);
 }

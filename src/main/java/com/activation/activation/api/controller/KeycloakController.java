@@ -32,7 +32,7 @@ public class KeycloakController {
     }
 
     @GetMapping("/{username}")
-    public List<KeycloakUserDetails> getUserDetails(@PathVariable String username){
+    public KeycloakUserDetails getUserDetails(@PathVariable String username){
         return keycloakService.getUserDetails(username);
     }
 

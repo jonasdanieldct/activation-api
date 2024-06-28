@@ -1,5 +1,6 @@
 package com.activation.activation.api.controller;
 
+import com.activation.activation.api.exception.NoUserFoundException;
 import com.activation.activation.api.model.AccessToken;
 import com.activation.activation.api.model.KeycloakUserDetails;
 import com.activation.activation.api.model.request.CreateKeycloakUserRequest;

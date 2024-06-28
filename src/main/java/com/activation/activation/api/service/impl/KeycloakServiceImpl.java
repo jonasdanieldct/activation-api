@@ -2,6 +2,7 @@ package com.activation.activation.api.service.impl;
 
 import com.activation.activation.api.config.KeycloakProperties;
 import com.activation.activation.api.config.KeycloakEndpointProperties;
+import com.activation.activation.api.exception.NoUserFoundException;
 import com.activation.activation.api.model.AccessToken;
 import com.activation.activation.api.model.KeycloakUserDetails;
 import com.activation.activation.api.model.request.CreateKeycloakUserRequest;
@@ -12,8 +13,13 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +34,10 @@ import java.util.stream.Collectors;
     @Autowired
     KeycloakProperties keycloakProperties;
 
+    private static final Logger logger = LoggerFactory.getLogger(KeycloakServiceImpl.class);
+
     public AccessToken generateAccessToken() {
+        logger.info("KeycloakServiceImpl.generateAccessToken");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -40,27 +49,36 @@ import java.util.stream.Collectors;
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(map, headers);
 
-        ResponseEntity<AccessToken> response = restTemplate.exchange(keycloakEndpointProperties.getToken(), HttpMethod.POST,requestEntity,AccessToken.class);
+        ResponseEntity<AccessToken> response = restTemplate.exchange(keycloakEndpointProperties.getToken(), HttpMethod.POST, requestEntity, AccessToken.class);
         return response.getBody();
     }
 
     public String createKeycloakUser(CreateKeycloakUserRequest createKeycloakUserRequest) {
+        logger.info("KeycloakServiceImpl.getuserDetails (createKeycloakUser :{})", createKeycloakUserRequest);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(generateAccessToken().getAccessToken());
 
         HttpEntity<CreateKeycloakUserRequest> requestEntity = new HttpEntity<>(createKeycloakUserRequest, headers);
-        return restTemplate.exchange(keycloakEndpointProperties.getCreateUser(),HttpMethod.POST,requestEntity,String.class).toString();
+        return restTemplate.exchange(keycloakEndpointProperties.getCreateUser(), HttpMethod.POST, requestEntity, String.class).toString();
     }
 
     public List<KeycloakUserDetails> getUserDetails(String username){
+        logger.info("KeycloakServiceImpl.getuserDetails (username :{})", username);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(generateAccessToken().getAccessToken());
+        List<KeycloakUserDetails> keycloakUsers = new ArrayList<>();
 
-        HttpEntity requestEntity = new  HttpEntity(headers);
-        String endpoint = keycloakEndpointProperties.getGetUserDetails()+ "?username="+username+"&max=1";
-        List<KeycloakUserDetails> keycloakUsers = restTemplate.exchange(endpoint, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<KeycloakUserDetails>>() {}).getBody();
-        return keycloakUsers.stream().filter(user -> user.getUsername().equals(username)).collect(Collectors.toList());
+        HttpEntity requestEntity = new HttpEntity(headers);
+        String endpoint = keycloakEndpointProperties.getGetUserDetails() + "?username=" + username + "&max=1";
+            keycloakUsers = restTemplate.exchange(endpoint, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<KeycloakUserDetails>>() {
+            }).getBody().stream().filter(user -> user.getUsername().equals(username)).collect(Collectors.toList());
+
+            if (keycloakUsers.isEmpty()) {
+                throw new NoUserFoundException("No user found with username: " + username);
+            }
+
+        return keycloakUsers;
     }
 }

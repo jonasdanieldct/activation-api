@@ -4,6 +4,7 @@ import com.activation.activation.api.config.KeycloakProperties;
 import com.activation.activation.api.config.KeycloakEndpointProperties;
 import com.activation.activation.api.exception.NoUserFoundException;
 import com.activation.activation.api.model.AccessToken;
+import com.activation.activation.api.model.KeycloakRole;
 import com.activation.activation.api.model.KeycloakUserDetails;
 import com.activation.activation.api.model.request.CreateKeycloakUserRequest;
 import com.activation.activation.api.service.KeycloakService;
@@ -19,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service public class KeycloakServiceImpl implements KeycloakService {
 
@@ -78,5 +78,15 @@ import java.util.stream.Collectors;
             }
 
         return keycloakUser;
+    }
+
+    public List<KeycloakRole> getKeycloakRoles(){
+        logger.info("KeycloakServiceImpl.getKeycloakRoles");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(generateAccessToken().getAccessToken());
+
+        HttpEntity requestEntity = new HttpEntity(headers);
+        return restTemplate.exchange(keycloakEndpointProperties.getRole(),HttpMethod.GET,requestEntity,new ParameterizedTypeReference<List<KeycloakRole>>() {}).getBody();
     }
 }

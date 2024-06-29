@@ -1,7 +1,7 @@
 package com.activation.activation.api.controller;
 
-import com.activation.activation.api.exception.NoUserFoundException;
 import com.activation.activation.api.model.AccessToken;
+import com.activation.activation.api.model.KeycloakRole;
 import com.activation.activation.api.model.KeycloakUserDetails;
 import com.activation.activation.api.model.request.CreateKeycloakUserRequest;
 import com.activation.activation.api.service.KeycloakService;
@@ -31,9 +31,14 @@ public class KeycloakController {
         keycloakService.createKeycloakUser(createKeycloakUserRequest);
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/user/{username}")
     public KeycloakUserDetails getUserDetails(@PathVariable String username){
         return keycloakService.getUserDetails(username);
+    }
+
+    @GetMapping("/roles")
+    public List<KeycloakRole> getKeycloakRoles(){
+        return keycloakService.getKeycloakRoles();
     }
 
 }

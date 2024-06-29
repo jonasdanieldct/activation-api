@@ -14,5 +14,6 @@ import org.springframework.stereotype.Component;
     private String clientId;
     @JsonProperty("grant_type")
     private String grantType;
+    private String uuid;
 
 }

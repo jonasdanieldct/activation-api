@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
         errorResponse.setTimestamp(Instant.now().toString());
         errorResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         errorResponse.setError(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-        errorResponse.setMessage("An unexpected error occurred");
+        errorResponse.setMessage(e.getMessage());
         errorResponse.setPath(request.getRequestURI());
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
